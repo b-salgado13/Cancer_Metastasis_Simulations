@@ -51,7 +51,7 @@ class Viewer(object):
 
     def create_sample_scene(self):
         # Create three cancer cells and add them to the scene at fixed positions
-        positions = [(0, 0, 0), (0, 2, 0), (0, 0, 2)]
+        positions = [(0, 0, 0), (0, 1, 0), (0, 0, 1), (0, 0, 2)]
         for pos in positions:
             cancer_node = CancerCell()
             cancer_node.translate(pos[0], pos[1], pos[2])
