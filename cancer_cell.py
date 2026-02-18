@@ -9,7 +9,7 @@ class CancerCell(HierarchicalNode):
 
         # Central body of the cell
         body = Sphere()
-        body.color = (1, 0.4, 0.4) # Main center ball color
+        body.color = (1, 0.2, 0.2) # Main center ball color
         self.child_nodes.append(body)
 
         # Add bumps (smaller spheres)
@@ -18,7 +18,7 @@ class CancerCell(HierarchicalNode):
 
         for _ in range(num_bumps):
             bump = Sphere()
-            bump.color = (1, 0.698, 0.4) # Small bumps color
+            bump.color = (1, 0.4, 0.2) # Small bumps color
 
             # Random position on surface
             theta = random.uniform(0, 2 * math.pi)
