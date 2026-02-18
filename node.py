@@ -161,13 +161,19 @@ class Node(object):
         self.selected = False
         self.depth = 0 # for moving
         self.selected_loc = None # for moving
+        self.color = None # Explicit RGB color
 
     def render(self):
         """ renders the item to the screen """
         glPushMatrix()
         glMultMatrixf(numpy.transpose(self.translation_matrix))
         glMultMatrixf(self.scaling_matrix)
-        cur_color = Color.COLORS[self.color_index]
+
+        if self.color is not None:
+            cur_color = self.color
+        else:
+            cur_color = Color.COLORS[self.color_index]
+
         glColor3f(cur_color[0], cur_color[1], cur_color[2])
         if self.selected:  # emit light if the node is selected
             glMaterialfv(GL_FRONT, GL_EMISSION, [0.3, 0.3, 0.3])
