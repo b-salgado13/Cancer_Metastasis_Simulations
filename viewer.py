@@ -6,6 +6,7 @@ import numpy
 from scene import Scene
 from interaction import Interaction
 from node import init_primitives
+import node
 from cancer_cell import CancerCell
 
 class Viewer(object):
@@ -49,10 +50,12 @@ class Viewer(object):
         self.create_sample_scene()
 
     def create_sample_scene(self):
-        # Create a cancer cell and add it to the scene
-        cancer_node = CancerCell()
-        cancer_node.translate(0, 0, 0)
-        self.scene.add_node(cancer_node)
+        # Create three cancer cells and add them to the scene at fixed positions
+        positions = [(0, 0, 0), (0, 2, 0), (0, 0, 2)]
+        for pos in positions:
+            cancer_node = CancerCell()
+            cancer_node.translate(pos[0], pos[1], pos[2])
+            self.scene.add_node(cancer_node)
 
     def init_interaction(self):
         """ init user interaction and callbacks """
@@ -97,7 +100,6 @@ class Viewer(object):
         glDisable(GL_LIGHTING)
         # Use a simpler grid drawing if display list fails or just call it
         # Assuming G_OBJ_PLANE is available globally from node module
-        import node
         if node.G_OBJ_PLANE is not None:
              glCallList(node.G_OBJ_PLANE)
 

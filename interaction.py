@@ -42,8 +42,7 @@ class Interaction(object):
             self.pressed = button
             if button == GLUT_RIGHT_BUTTON:
                 pass
-            elif button == GLUT_LEFT_BUTTON:  # pick
-                self.trigger('pick', x, y)
+            # Removed PICK logic for LEFT_BUTTON
             elif button == 3:  # scroll up
                 self.translate(0, 0, 1.0)
             elif button == 4:  # scroll down
@@ -63,8 +62,7 @@ class Interaction(object):
                 # ignore the updated camera loc because we want to always
                 # rotate around the origin
                 self.trackball.drag_to(self.mouse_loc[0], self.mouse_loc[1], dx, dy)
-            elif self.pressed == GLUT_LEFT_BUTTON:
-                self.trigger('move', x, y)
+            # Removed MOVE logic for LEFT_BUTTON
             elif self.pressed == GLUT_MIDDLE_BUTTON:
                 self.translate(dx/60.0, dy/60.0, 0)
             else:
@@ -74,32 +72,7 @@ class Interaction(object):
 
     def handle_keystroke(self, key, x, screen_y):
         """ Called on keyboard input from the user """
-        xSize, ySize = glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)
-        y = ySize - screen_y
-
-        # key comes as bytes in Python 3 usually, or maybe int?
-        # glutKeyboardFunc passes 'key' as bytes.
-
-        if isinstance(key, bytes):
-            try:
-                key = key.decode('utf-8')
-            except:
-                pass # might be special key passed as int to glutSpecialFunc?
-
-        # glutSpecialFunc passes int.
-
-        if key == 's':
-            self.trigger('place', 'sphere', x, y)
-        elif key == 'c':
-            self.trigger('place', 'cube', x, y)
-        elif key == GLUT_KEY_UP:
-            self.trigger('scale', up=True)
-        elif key == GLUT_KEY_DOWN:
-            self.trigger('scale', up=False)
-        elif key == GLUT_KEY_LEFT:
-            self.trigger('rotate_color', forwards=True)
-        elif key == GLUT_KEY_RIGHT:
-            self.trigger('rotate_color', forwards=False)
+        # Disabled all object manipulation keys
         glutPostRedisplay()
 
     def register_callback(self, name, func):
