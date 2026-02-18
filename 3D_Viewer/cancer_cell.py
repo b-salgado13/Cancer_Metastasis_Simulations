@@ -9,12 +9,7 @@ class CancerCell(HierarchicalNode):
 
         # Central body of the cell
         body = Sphere()
-        # Scale body to be larger? Let's keep it unit size (diameter 1) for now, or scale it up.
-        # If we scale it, we should use the scaling matrix.
-        # But for initial setup, we can just leave it as is or scale it.
-        # Let's make it slightly larger so it's the main feature.
-        # body.scale(True) # Scale up by 1.1
-        # Let's just use it as base.
+        body.color = (1, 0.2, 0.2) # Main center ball color
         self.child_nodes.append(body)
 
         # Add bumps (smaller spheres)
@@ -23,6 +18,7 @@ class CancerCell(HierarchicalNode):
 
         for _ in range(num_bumps):
             bump = Sphere()
+            bump.color = (1, 0.4, 0.2) # Small bumps color
 
             # Random position on surface
             theta = random.uniform(0, 2 * math.pi)
