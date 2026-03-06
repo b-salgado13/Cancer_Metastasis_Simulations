@@ -5,8 +5,8 @@ The general information on the models used for this purpose is listed below:
   - $c_{max}$: maximum oxygen available befor hypoxia
   - C = $\dfrac{c}{c_{max}}$: normalized oxygen consumption ratio
   - $\phi$($\vec{x}$,t): pro-angiogenic factor field
-  - $\dot{d}$ = $\alpha$ * C: cell death probability 
-  - $\dot{b}$ = $\beta$ * (1 + $\gamma$ - C): cell division probability 
+  - $\dot{d}$ = $\alpha$ * C: cell death probability
+  - $\dot{b}$ = $\beta$ * (1 + $\gamma$ - C): cell division probability
   - R = $\dfrac{\dot{b}}{\dot{d}}$: ratio of cell division and death probabilities (for fractal nature)
 
 Main contributors:
