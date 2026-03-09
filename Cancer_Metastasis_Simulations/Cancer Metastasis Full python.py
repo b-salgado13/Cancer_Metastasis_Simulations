@@ -81,25 +81,19 @@ NEIGHBORS_6  = [(1,0,0),(-1,0,0),(0,1,0),(0,-1,0),(0,0,1),(0,0,-1)]
 # ─────────────────────────────────────────────
 #  DIFFUSION (2D finite differences, applied per z-slice for speed)
 # ─────────────────────────────────────────────
-def diffusion_step_2d(field_2d: np.ndarray, D: float, dt: float, dx: float) -> np.ndarray:
-    """One explicit finite-difference step of the 2D diffusion equation."""
-    u = field_2d
-    u_new = u.copy()
-    # interior points only (Neumann BC: zero-flux at boundary)
-    u_new[1:-1, 1:-1] = u[1:-1, 1:-1] + D * dt / dx**2 * (
-        u[2:, 1:-1] + u[:-2, 1:-1] +
-        u[1:-1, 2:] + u[1:-1, :-2] -
-        4 * u[1:-1, 1:-1]
-    )
-    return u_new
-
-
 def diffuse_3d(field: np.ndarray, D: float, n_steps: int, dt: float = DT, dx: float = DX) -> np.ndarray:
-    """Apply 2D diffusion independently on each z-slice for n_steps."""
+    """Apply 3D diffusion using explicit finite-difference steps and vectorized operations."""
+    u = field.copy()
+    factor = D * dt / dx**2
     for _ in range(n_steps):
-        for z in range(field.shape[2]):
-            field[:, :, z] = diffusion_step_2d(field[:, :, z], D, dt, dx)
-    return field
+        # interior points only (Neumann BC: zero-flux at boundary)
+        u[1:-1, 1:-1, 1:-1] = u[1:-1, 1:-1, 1:-1] + factor * (
+            u[2:, 1:-1, 1:-1] + u[:-2, 1:-1, 1:-1] +
+            u[1:-1, 2:, 1:-1] + u[1:-1, :-2, 1:-1] +
+            u[1:-1, 1:-1, 2:] + u[1:-1, 1:-1, :-2] -
+            6 * u[1:-1, 1:-1, 1:-1]
+        )
+    return u
 
 
 # ─────────────────────────────────────────────
@@ -180,7 +174,7 @@ class TumorSimulation:
 
     def _update_oxygen(self):
         """Diffuse oxygen and subtract pro-angiogenic contribution (Eq. 5)."""
-        self.c = diffuse_3d(self.c.copy(), D_OX, N_OX)
+        self.c = diffuse_3d(self.c, D_OX, N_OX)
         if self.angiogenic_on:
             self.c -= DELTA * self.phi
             self.c = np.clip(self.c, 0.0, None)
@@ -192,14 +186,15 @@ class TumorSimulation:
         cx, cy, cz = self.L // 2, self.L // 2, self.L // 2
         # Estimate tumor radius from cell count
         r_est = max(1, (3 * N / (4 * np.pi)) ** (1/3))
-        shell_inner = r_est * 0.7
+        shell_inner_sq = (r_est * 0.7) ** 2
 
+        phi_increase = (N / N_A) * 0.5
         for cell in self.cells:
-            dist = np.sqrt((cell.x - cx)**2 + (cell.y - cy)**2 + (cell.z - cz)**2)
-            if dist >= shell_inner:
-                self.phi[cell.x, cell.y, cell.z] += (N / N_A) * 0.5
+            dist_sq = (cell.x - cx)**2 + (cell.y - cy)**2 + (cell.z - cz)**2
+            if dist_sq >= shell_inner_sq:
+                self.phi[cell.x, cell.y, cell.z] += phi_increase
 
-        self.phi = diffuse_3d(self.phi.copy(), D_CH * DT, N_CH)
+        self.phi = diffuse_3d(self.phi, D_CH * DT, N_CH)
 
     # ── Choose neighbor for daughter cell ───────────────────────────────────
 
