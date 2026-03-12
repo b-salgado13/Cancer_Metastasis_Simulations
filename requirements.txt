@@ -1,2 +1,5 @@
-numpy
 PyOpenGL
+numpy
+matplotlib
+mpl_toolkits
+concurrent
