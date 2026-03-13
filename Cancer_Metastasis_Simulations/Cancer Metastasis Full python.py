@@ -12,11 +12,18 @@ Variables:
   - b  = beta * (1 + gamma - C) (cell division probability)
   - phi(x,t): pro-angiogenic factor field
   - R  = b/d : division-to-death ratio (strange attractor axis)
-
-Oxygen update order each step (physically consistent):
-  1. Cellular uptake via Michaelis-Menten  — cells deplete local oxygen first
-  2. Diffusion                             — gradients re-equilibrate
-  3. Angiogenic supply (if switch is ON)   — new vessels restore oxygen
+  - Metastasis: if a cell tries to divide into an occupied site, it performs a random walk outward until it finds an empty site. 
+    If the last occupied site has only 1 neighbour, the daughter cell detaches → metastatic event.
+  - Angiogenic switch: when population reaches N_A, cells start producing phi on the outer shell, which diffuses and restores oxygen.
+  - Necrosis: cells with O < O_HYPOXIA become hypoxic and start producing phi; 
+    if O < O_NECROSIS for too long, they become necrotic and stop consuming oxygen. 
+    Necrotic cells are gradually cleared, creating space for new growth.
+  - Condensing vs non-condensing phenotypes: 
+    condensing cells (gamma > 0) have higher division and death rates, leading to more dynamic turnover and a more compact tumor; 
+    non-condensing cells (gamma < 0) have lower rates, leading to slower growth and a more diffuse morphology. 
+    This models the trade-off between aggressive proliferation and mechanical pressure in tumor evolution.
+  - Parameter sweep: we can run multiple simulations in parallel with different (alpha, beta) pairs 
+    to explore how the balance of growth and death rates affects tumor dynamics and metastatic potential.
 """
 
 from __future__ import annotations
@@ -220,7 +227,7 @@ class TumorSimulation:
             val *= 0.75  # Hypoxic cells divide more slowly
         return float(np.clip(val, 0.0, 1.0))
 
-    # ── Angiogenic switch & diffusion (Sec. II B-D) ──────────────────────────
+    # ── Angiogenic switch & diffusion ──────────────────────────
 
     def _consume_oxygen(self):
         """
@@ -246,8 +253,7 @@ class TumorSimulation:
 
     def _update_oxygen(self):
         """
-        Update oxygen field each simulation step.
-        Physically correct order:
+        Update oxygen field each simulation step:
           1. Cellular uptake  — cells deplete local oxygen first
           2. Diffusion        — gradients re-equilibrate across the lattice
           3. Angiogenic supply — new vessels restore oxygen (only after switch)
@@ -640,11 +646,11 @@ if __name__ == '__main__':
     print(f"Total metastatic events: {sum(sim.history['metastatic_cells'])}")
     print(f"Angiogenic switch triggered: {sim.angiogenic_on}")
  
-    plot_results(sim,        fig_path='tumor_results.png')
-    plot_oxygen_slice(sim,   fig_path='tumor_diffusion.png')
+    plot_results(sim,        fig_path='results/tumor_results.png')
+    plot_oxygen_slice(sim,   fig_path='results/tumor_diffusion.png')
  
     # ── Parallel parameter sweep  (runs all combos concurrently)
     print("\n--- Comparing parameter pairs (α, β) in parallel ---")
     combos = [(0.3, 0.5), (0.3, 0.7), (0.3, 0.9), (0.7, 0.5), (0.7, 0.9)]
     sweep  = run_parameter_sweep(combos, n_steps=MAX_SIM_STEPS, seed=SEED)
-    plot_comparison(sweep, fig_path='tumor_comparison.png')
+    plot_comparison(sweep, fig_path='results/tumor_comparison.png')
