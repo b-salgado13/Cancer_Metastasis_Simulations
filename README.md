@@ -441,13 +441,13 @@ Along with a plot for the general description of important parameters of the tum
 * Mean hypoxia ratio
 * 3D tumor morphology
 
-![Tumor results](example-outputs\tumor_results.png)
+![Tumor results](example-outputs/tumor_results.png)
 
 A second plot that shows:
 * Oxygen concentration heat map
 * Pro-angiogenic factor heat map
 
-![Oxygen field](example-outputs\tumor_diffusion.png)
+![Oxygen field](example-outputs/tumor_diffusion.png)
 
 The results of the parameter sweep executed through parallel computation gives the following graph:
 
