@@ -30,6 +30,7 @@ This repository collects computational models developed to simulate the growth o
 6. [Installation & Usage](#installation--usage)
 7. [Example Output](#example-output)
 8. [References](#references)
+9. [Citation](#citation)
 
 ---
 
@@ -83,8 +84,6 @@ Each lattice site contains either:
 
 Cells interact with their **18 nearest neighbors** (first and second order neighbors).
 
----
-
 ### 2. Oxygen Field Dynamics
 
 The oxygen concentration field
@@ -104,8 +103,6 @@ where
 * $D_O$ : oxygen diffusion coefficient
 * $Q(O)$ : oxygen consumption by tumor cells
 
----
-
 ### 3. Cellular Oxygen Consumption
 
 Cells consume oxygen following **Michaelis–Menten kinetics**, a standard model for metabolic uptake:
@@ -121,8 +118,6 @@ This form captures the biological fact that oxygen consumption **saturates at hi
 
 Only **living cells consume oxygen**, while necrotic cells do not.
 
----
-
 ### 4. Hypoxia Ratio
 
 A useful quantity derived from the oxygen concentration is the **hypoxia ratio**
@@ -137,8 +132,6 @@ Properties:
 | Low oxygen   | $C \approx 1$ |
 
 This quantity directly modulates **cell division and death probabilities**.
-
----
 
 ### 5. Cell Fate Probabilities
 
@@ -160,8 +153,6 @@ where
 
 Hypoxic regions therefore experience higher mortality.
 
----
-
 #### Division probability
 
 $$b = \beta(1 + \gamma - C)$$
@@ -170,8 +161,6 @@ where
 
 * $\beta$ controls the proliferation rate
 * $\gamma$ is the **phenotype parameter**
-
----
 
 ### 6. Cell Phenotypes
 
@@ -187,8 +176,6 @@ Characteristics:
 * Higher turnover
 * Compact tumor morphology
 
----
-
 #### Non-condensing cells
 
 $$\gamma < 0$$
@@ -199,8 +186,6 @@ Characteristics:
 * More diffuse tumor structure
 
 This mechanism models **evolutionary trade-offs in tumor populations**.
-
----
 
 ### 7. Angiogenic Switch
 
@@ -224,8 +209,6 @@ $$O \leftarrow O + \Delta \phi$$
 
 This represents the **angiogenic switch**, a hallmark of cancer progression.
 
----
-
 ### 8. Hypoxia and Necrosis
 
 Cells respond to oxygen depletion through two thresholds:
@@ -238,8 +221,6 @@ Effects:
 
 * reduced division
 * secretion of angiogenic factors
-
----
 
 #### Necrotic threshold
 
@@ -254,8 +235,6 @@ Necrotic cells:
 
 This produces a **necrotic tumor core**.
 
----
-
 ### 9. Metastasis Mechanism
 
 Metastasis is modeled as a **mechanical detachment process**.
@@ -269,8 +248,6 @@ When a cell attempts division into an occupied site:
 This event is recorded as a **metastatic event**.
 
 The outward bias models **mechanical pressure pushing cells toward the tumor surface**.
-
----
 
 ### 10. Division-Death Ratio
 
@@ -464,18 +441,23 @@ Along with a plot for the general description of important parameters of the tum
 * Mean hypoxia ratio
 * 3D tumor morphology
 
-![Tumor results](example-outputs/tumor_results.png)
+![Tumor results](example-outputs\tumor_results.png)
 
 A second plot that shows:
 * Oxygen concentration heat map
 * Pro-angiogenic factor heat map
 
-![Oxygen field](example-outputs/tumor_diffusion.png)
+![Oxygen field](example-outputs\tumor_diffusion.png)
 
-The results of the parameter sweep executed through parallel computation are still under development.
+The results of the parameter sweep executed through parallel computation gives the following graph:
+
+![Parameter sweep](example-outputs/tumor_comparison.png)
+
 
 ---
+
 ## References
+
 1. Terradellas Igual, A. (2019). *Fractal dynamics and cancer growth.* (Master Thesis, Universitat Pompeu Fabra). Not published.
 2. Ojwang', A.M.E., Bazargan, S., Johnson, J.O., Pilon-Thomas, S. & Rejniak, K.A. (2024) *Histology-guided mathematical model of tumor oxygenation.* bioRxiv [Preprint]. doi: 10.1101/2024.03.05.583363.
 
