@@ -1,8 +1,9 @@
 # Simulation of Cancer Cell Metastasis
 
-![Python](https://img.shields.io/badge/python-3.9+-blue)
+![Python](https://img.shields.io/badge/python-3.8+-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Status](https://img.shields.io/badge/status-research-orange)
+![Field](https://img.shields.io/badge/field-computational%20biophysics-purple)
 ![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macOS%20%7C%20windows-lightgrey)
 ![GitHub last commit](https://img.shields.io/github/last-commit/b-salgado13/Cancer_Metastasis_Simulations)
 
@@ -14,6 +15,7 @@ This repository collects computational models developed to simulate the growth o
 
 1. [Project Overview](#project-overview)
 2. [Description of the Model](#description-of-the-model)
+    1. [Biological Motivation](#biological-motivation)
 3. [Mathematical Model](#mathematical-model)
     1. [Spatial Representation](#1-spatial-representation)
     2. [Oxygen Field Dynamics](#2-oxygen-field-dynamics)
@@ -27,16 +29,26 @@ This repository collects computational models developed to simulate the growth o
     10. [Division-Death Ratio](#10-division-death-ratio)
 4. [Model Assumptions and Limitations](#model-assumptions-and-limitations)
 5. [Relation to Statistical Physics and Renormalization Group](#relation-to-statistical-physics-and-renormalization-group)
-6. [Installation & Usage](#installation--usage)
-7. [Example Output](#example-output)
-8. [References](#references)
-9. [Citation](#citation)
+6. [3D Visualization Tool](#3d-visualization-tool)
+6. [Project Structure](#project-structure)
+7. [Installation & Usage](#installation--usage)
+8. [Example Output](#example-output)
+9. [References](#references)
+10. [Citation](#citation)
+11. [License](#license)
 
 ---
 
 ## Project Overview
 
 This code is part of a research project carried out by [Bruno Salgado](https://brunosalgado.website/) under the supervision of [Dr. Pere Masjuan](https://orcid.org/0000-0002-8276-413X) at the Institut de Física d'Altes Energies ([IFAE](https://www.ifae.es/es/)) as part of the [Master of Multidisciplinary Research in Experimental Sciences](https://www.upf.edu/web/mmres/) at Universitat Pompeu Fabra.
+
+The goal is to understand metastatic spread as an emergent phenomenon governed by:
+- Non-equilibrium statistical physics
+- Reaction–diffusion dynamics
+- Scaling laws and universality classes
+
+The simulations implemented here serve as a computational testbed for validating theoretical predictions derived from field-theoretic approaches.
 
 ---
 
@@ -342,15 +354,92 @@ Understanding these large-scale behaviors may help identify robust features of t
 
 ---
 
+## 3D Visualization Tool
+
+This repository includes an interactive **3D Viewer** designed to visualize the spatial structure and temporal evolution of the simulated tumor system.
+
+The viewer allows you to:
+- Explore the 3D distribution of cancer cells and microenvironment variables
+- Inspect the emergence of necrotic cores and invasive fronts
+- Analyze spatial heterogeneity and clustering behavior
+- Interactively rotate, zoom, and slice the simulation domain
+
+This tool is particularly useful for qualitatively validating the reaction–diffusion dynamics and identifying emergent structures that are not easily captured in 2D projections.
+
+For detailed usage instructions and implementation details, see the dedicated documentation:
+
+👉 [`3D_Viewer/README.md`](./3D_Viewer/README.md)
+
+---
+
+## Project Structure
+
+```bash
+Cancer_Metastasis_Simulations/
+│
+├── 3D_Viewer/
+│   ├── README.md          # Documentation for the 3D viewer
+│   ├── viewer.py          # Entry point — GLUT window, render loop, event dispatch
+│   ├── scene.py           # Scene graph manager (add, render, pick, move, scale)
+│   ├── node.py            # Node base classes, primitives (Sphere, Cube), AABB
+│   ├── cancer_cell.py     # CancerCell hierarchical node (body + bumps)
+│   ├── interaction.py     # Mouse/keyboard callbacks, camera translation
+│   ├── trackball.py       # Quaternion trackball for 3D rotation
+│   └── data/
+│       ├── tumor_cells.csv    # Per-cell snapshot (position, phenotype, bio-params)
+│       └── tumor_history.csv  # Per-step simulation statistics
+│
+├── Simulation/
+│   ├── results/
+│   │   ├── tumor_results.png
+│   │   ├── tumor_diffusion.png
+│   │   └── tumor_comparison.png
+│   ├── Cancer Metastasis Full python.py   # Main simulation code
+│   └── Metastasis simulation.ipynb        # Simulation code explained by general blocks
+│
+├── example-outputs/
+│   ├── example_tumor_results.png
+│   ├── example_tumor_diffusion.png
+│   ├── example_tumor_comparison.png
+│   ├── example_inner_3d_viewer.png
+│   ├── example_outer_3d_viewer.png
+│   └── example_outer_3d_viewer.gif
+│
+├── LICENSE                                # MIT License
+├── README.md                              # Documentation
+└── requirements.txt                       # Python dependencies
+```
+
+---
+
 ## Installation & Usage
+
 ### Python Version
-- Python 3.7 or higher recommended
+
+- Python 3.8 or higher recommended
 - Check your version: `python --version` or `python3 --version`
 
 ### Required Libraries
+
 Most libraries are built-in, but you'll need to install:
-- Libraries: `numpy`, `matplotlib`, `mpl_toolkits`, `concurrent` and `PyOpenGL`
+- Libraries: `numpy`, `pandas`, `matplotlib` and `PyOpenGL`
+
+Install system GLUT if it is not already present:
+
+```bash
+# Debian / Ubuntu
+sudo apt-get install freeglut3-dev
+
+# macOS (Homebrew)
+brew install freeglut
+
+# Windows
+# Download freeglut binaries from https://freeglut.sourceforge.net/
+# and place glut32.dll / glut64.dll on your PATH.
+```
+
 #### Setup
+
 1. Clone repository:
 ```bash
 git clone https://github.com/b-salgado13/Cancer_Metastasis_Simulations.git
@@ -362,14 +451,15 @@ pip install -r requirements.txt
 ```
 
 ### Running the Model
-To execute the main simulation and generate plots for the Querétaro data **Run from terminal**:
+
+To execute the main simulation and generate the data and plots similar to those found in [Example Output](#example-output) section **Run from terminal**:
    ```bash
-   cd Cancer_Metastasis_Simulations
+   cd Simulation
    python "Cancer Metastasis Full python.py"
    ```
    or
    ```bash
-   cd Cancer_Metastasis_Simulations
+   cd Simulation
    python3 "Cancer Metastasis Full python.py"
    ```
 
@@ -398,7 +488,7 @@ K_M   = 0.1         # Michaelis-Menten half-saturation constant
 
 # ── Necrotic threshold 
 O_HYPOXIA = 0.15     # Cells with O < O_HYPOXIA become hypoxic and start producing pro-angiogenic factors
-O_NECROSIS = 0.05   # Cells with O < O_NECROSIS become necrotic and stop consuming O)
+O_NECROSIS = 0.05   # Cells with O < O_NECROSIS become necrotic and stop consuming O
 NECROSIS_DELAY = 4  # Slow death under hypoxia
 NECROTIC_CLEAR_RATE = 0.001  # Fraction of necrotic cells cleared per step (simulate immune clearance)
 
@@ -410,7 +500,7 @@ MAX_SIM_STEPS = 40    # simulation time steps
 SEED    = 42
 ```
 
-The execution of the `` returns in the terminal de following results:
+The execution of the `Cancer Metastasis Full python.py` file returns in the terminal the following results:
 
 ```bash
 ============================================================
@@ -441,17 +531,60 @@ Along with a plot for the general description of important parameters of the tum
 * Mean hypoxia ratio
 * 3D tumor morphology
 
-![Tumor results](example-outputs/tumor_results.png)
+![Tumor results](example-outputs/example_tumor_results.png)
 
 A second plot that shows:
 * Oxygen concentration heat map
 * Pro-angiogenic factor heat map
 
-![Oxygen field](example-outputs/tumor_diffusion.png)
+![Oxygen field](example-outputs/example_tumor_diffusion.png)
 
-The results of the parameter sweep executed through parallel computation gives the following graph:
+The results of the parameter sweep executed through parallel computation gives the following output in the terminal:
 
-![Parameter sweep](example-outputs/tumor_comparison.png)
+```bash
+--- Comparing parameter pairs (α, β) in parallel ---
+  [t=24] Angiogenic switch ON  (N=591)
+  [t=26] Angiogenic switch ON  (N=556)
+  α=0.3, β=0.5: final N=0, meta=0
+  α=0.7, β=0.5: final N=0, meta=0
+  [t=29] Angiogenic switch ON  (N=535)
+  α=0.7, β=0.8: final N=29353, meta=2288
+  α=0.3, β=0.7: final N=52168, meta=704
+  α=0.3, β=0.8: final N=63395, meta=416
+
+Comparison figure saved → results/tumor_comparison.png
+```
+
+Along with the following graph:
+
+![Parameter sweep](example-outputs/example_tumor_comparison.png)
+
+Besides these, the code exports major data from the last snapshot of all the cancer cells and the evolution of the key parameters of the tumor:
+
+```bash
+  Downsampling: 25377 cells → 5000 exported  (surface=4183, necrotic=44, interior=773/21150)
+  Cell snapshot saved → ../3D_Viewer/data/tumor_cells.csv
+  History saved       → ../3D_Viewer/data/tumor_history.csv  (40 steps)
+```
+
+After obtaining this results, the execution of the `3D_Viewer\viewer.py` gives an interactive 3D OpenGL viewer for visualizing cancer cell tumor simulations. The following images show the visual representation of the outside and inside of the tumor:
+
+![Outer_tumor](example-outputs/example_outer_3d_viewer.png)
+
+![Inner_tumor](example-outputs/example_inner_3d_viewer.png)
+
+Here it is a small demonstration of the interactive GUI:
+
+![Interactive_GUI](example-outputs/example_3d_viewer.gif)
+
+Where the colors for each cell represent the following:
+
+| Phenotype | Colour | Hex | Biological Meaning |
+|---|---|---|---|
+| `necrotic` | ⚫ Black | `#000000` | Dead cells in the hypoxic core |
+| `surface` | 🟣 Magenta | `#FF00FF` | Outermost cells with empty neighbours |
+| `condensing` | 🔵 Blue | `#0000FF` | Cells with a condensation phenotype |
+| `non-condensing` | 🔴 Red | `#FF0000` | Cells with a non-condensation phenotype |
 
 
 ---
@@ -459,7 +592,7 @@ The results of the parameter sweep executed through parallel computation gives t
 ## References
 
 1. Terradellas Igual, A. (2019). *Fractal dynamics and cancer growth.* (Master Thesis, Universitat Pompeu Fabra). Not published.
-2. Ojwang', A.M.E., Bazargan, S., Johnson, J.O., Pilon-Thomas, S. & Rejniak, K.A. (2024) *Histology-guided mathematical model of tumor oxygenation.* bioRxiv [Preprint]. doi: 10.1101/2024.03.05.583363.
+2. Ojwang', A.M.E., Bazargan, S., Johnson, J.O., Pilon-Thomas, S. & Rejniak, K.A. (2024). *Histology-guided mathematical model of tumor oxygenation.* bioRxiv [Preprint]. doi: 10.1101/2024.03.05.583363.
 
 ---
 
@@ -473,3 +606,9 @@ Master of Multidisciplinary Research in Experimental Sciences (MMRES), Universit
 
 Repository:
 https://github.com/b-salgado13/Cancer_Metastasis_Simulations
+
+---
+
+## License
+
+This project is released under the [MIT License](LICENSE).

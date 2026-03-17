@@ -1,16 +1,25 @@
 import sys
+import os
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 import numpy
+import pandas as pd
 from scene import Scene
 from interaction import Interaction
 from node import init_primitives
 import node
 from cancer_cell import CancerCell
 
+path = 'data/tumor_cells.csv'
+
 class Viewer(object):
     def __init__(self):
+        if not os.path.exists(path):
+            print(f"ERROR: cells file not found: {path}")
+            sys.exit(1)
+        self.df = pd.read_csv(path)[['x', 'y', 'z', 'phenotype']]
+
         """ Initialize the viewer. """
         self.init_interface()
         self.init_opengl()
@@ -22,8 +31,8 @@ class Viewer(object):
         """ initialize the window and register the render function """
         glutInit(sys.argv) # glutInit needs sys.argv
         glutInitWindowSize(640, 480)
+        glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH) # Add GLUT_DEPTH
         glutCreateWindow(b"Cancer Cell Modeller")
-        glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH) # Add GLUT_DEPTH
         glutDisplayFunc(self.render)
 
     def init_opengl(self):
@@ -50,10 +59,9 @@ class Viewer(object):
         self.create_sample_scene()
 
     def create_sample_scene(self):
-        # Create three cancer cells and add them to the scene at fixed positions
-        positions = [(0, 0, 0), (0, 2, 0), (0, 0, 2)]
-        for pos in positions:
-            cancer_node = CancerCell()
+        # Create cancer cells and add them to the scene at fixed positions given by the CSV file.       
+        for pos in self.df.values:
+            cancer_node = CancerCell(phenotype=pos[3])
             cancer_node.translate(pos[0], pos[1], pos[2])
             self.scene.add_node(cancer_node)
 
@@ -106,7 +114,7 @@ class Viewer(object):
         glPopMatrix()
 
         # flush the buffers so that the scene can be drawn
-        glFlush()
+        glutSwapBuffers()
 
     def init_view(self):
         """ initialize the projection matrix """
