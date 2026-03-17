@@ -4,7 +4,7 @@ This folder contains an interactive 3D OpenGL viewer for visualizing cancer cell
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 1. [Overview](#overview)
 2. [Project Structure](#project-structure)
@@ -217,7 +217,7 @@ The execution of the `3D_Viewer\viewer.py` with the resulting files defined in t
 
 Here it is a small demonstration of the interactive GUI:
 
-![Interactive_GUI](example-outputs/example_3d_viewer.gif)
+![Interactive_GUI](../example-outputs/example_3d_viewer.gif)
 
 ---
 
