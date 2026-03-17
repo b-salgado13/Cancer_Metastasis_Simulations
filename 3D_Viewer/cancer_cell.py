@@ -4,16 +4,16 @@ import math
 from node import HierarchicalNode, Sphere, AABB
 
 class CancerCell(HierarchicalNode):
-    def __init__(self):
+    def __init__(self, phenotype: str = "condensing"):
         super(CancerCell, self).__init__()
-
+        self.phenotype = phenotype
         # Central body of the cell
         body = Sphere()
-        body.color = (1, 0.4, 0.4) # Main center ball color
+        body.color = (0.0, 0.0, 0.0) if self.phenotype == "necrotic" else (1.0, 0.0, 1.0) if self.phenotype == "surface" else (0.0, 0.0, 1.0) if self.phenotype == "condensing" else (1.0, 0.0, 0.0)
         self.child_nodes.append(body)
 
         # Add bumps (smaller spheres)
-        num_bumps = 15
+        num_bumps = 5
         radius = 0.5 # Radius of the central sphere (since diameter is 1.0)
 
         for _ in range(num_bumps):
@@ -33,8 +33,7 @@ class CancerCell(HierarchicalNode):
 
             # Scale bump down
             # We need to scale it down significantly.
-            # Sphere is diameter 1. We want diameter maybe 0.3?
-            # scale 0.3
+            # Sphere is diameter 1. We want bumps to be diameter 0.3, so scale by 0.3.
             # But scaling is incremental in Node.scale.
             # We can manually set scaling matrix or call scale multiple times?
             # Or just implement set_scale?

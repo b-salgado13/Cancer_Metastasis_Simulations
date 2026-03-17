@@ -1,5 +1,3 @@
 PyOpenGL
 numpy
 matplotlib
-mpl_toolkits
-concurrent
