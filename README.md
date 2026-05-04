@@ -27,15 +27,25 @@ This repository collects computational models developed to simulate the growth o
     8. [Hypoxia and Necrosis](#8-hypoxia-and-necrosis)
     9. [Metastasis Mechanism](#9-metastasis-mechanism)
     10. [Division-Death Ratio](#10-division-death-ratio)
-4. [Model Assumptions and Limitations](#model-assumptions-and-limitations)
-5. [Relation to Statistical Physics and Renormalization Group](#relation-to-statistical-physics-and-renormalization-group)
-6. [3D Visualization Tool](#3d-visualization-tool)
-6. [Project Structure](#project-structure)
-7. [Installation & Usage](#installation--usage)
-8. [Example Output](#example-output)
-9. [References](#references)
-10. [Citation](#citation)
-11. [License](#license)
+4. [Pareto Optimization Objectives](#pareto-optimization-objectives)
+  1. [Fitness](#1-fitness-to-maximize)
+  2. [Metastatic Efficiency Index (MEI)](#2-metastatic-efficiency-index-mei-to-minimize)
+  3. [Necrotic Core Fraction (NCF)](#3-necrotic-core-fraction-ncf-to-minimize)
+  4. [Dissipation Functional](#4-dissipation-functional-to-minimize)
+  5. [Purpose of Multi-Objective Optimization](#purpose-of-multi-objective-optimization)
+  6. [Biological Interpretation](#biological-interpretation)
+5. [Model Assumptions and Limitations](#model-assumptions-and-limitations)
+6. [Relation to Statistical Physics and Renormalization Group](#relation-to-statistical-physics-and-renormalization-group)
+7. [3D Visualization Tool](#3d-visualization-tool)
+8. [Project Structure](#project-structure)
+9. [Installation & Usage](#installation--usage)
+10. [Example Output](#example-output)
+    1. [Single Simulation](#single-simulation)
+    2. [Batch Parameter Sweep](#batch-parameter-sweep)
+    3. [Pareto Front Analysis](#pareto-front-analysis)
+11. [References](#references)
+12. [Citation](#citation)
+13. [License](#license)
 
 ---
 
@@ -276,6 +286,153 @@ This ratio can act as an **effective order parameter** for tumor growth regimes.
 
 ---
 
+## Pareto Optimization Objectives
+
+The parameter sweep performed in `batch_sweep.py` explores tumor dynamics across a multidimensional space of biological parameters. Each simulation is evaluated using a **multi-objective framework**, where different aspects of tumor behavior are quantified and optimized simultaneously.
+
+The goal is not to find a single “best” tumor, but to identify **trade-offs between competing biological processes**, represented by a **Pareto front**.
+
+The Pareto framework transforms the simulation from a simple growth model into a **system for exploring trade-offs in tumor evolution** which enables:
+
+* Identification of optimal growth regimes
+* Understanding of metastasis vs viability trade-offs
+* Characterization of tumor phenotypes across parameter space
+
+In this sense, each simulation is evaluated using four complementary metrics:
+
+---
+
+### 1. **Fitness** *(to maximize)*
+
+$$\text{Fitness} =
+\frac{N_{\text{alive}}}{O_{\text{consumed}} \cdot (1 + \lambda \cdot M)}$$
+
+* $N_{\text{alive}}$: number of living cells
+* $O_{\text{consumed}}$: total oxygen consumed
+* $M$: total metastatic events
+
+#### Interpretation
+
+This metric measures how efficiently the tumor converts oxygen into viable biomass while penalizing invasive behavior.
+
+* High fitness → efficient, viable, and contained tumor
+* Low fitness → wasteful, necrotic, or highly invasive tumor
+
+#### Optimization meaning
+
+Maximizing fitness favors tumors that:
+
+* grow efficiently
+* maintain viability
+* avoid unnecessary metastasis
+
+---
+
+### 2. **Metastatic Efficiency Index (MEI)** *(to minimize)*
+
+$$\text{MEI} =
+\frac{\text{metastatic events}}{N_{\text{total}}}$$
+
+#### Interpretation
+
+This measures the **relative invasiveness** of the tumor.
+
+* High MEI → aggressive, spreading tumor
+* Low MEI → compact, contained tumor
+
+#### Optimization meaning
+
+Minimizing MEI favors:
+
+* structural stability
+* reduced metastatic spread
+
+---
+
+### 3. **Necrotic Core Fraction (NCF)** *(to minimize)*
+
+$$\text{NCF} =
+\frac{N_{\text{necrotic}}}{N_{\text{total}}}$$
+
+#### Interpretation
+
+This quantifies the degree of **internal tumor failure due to hypoxia**.
+
+* High NCF → large necrotic core, poor oxygenation
+* Low NCF → well-oxygenated, viable tumor
+
+#### Optimization meaning
+
+Minimizing NCF favors:
+
+* efficient oxygen usage
+* delayed or avoided necrosis
+* healthier tumor structure
+
+---
+
+### 4. **Dissipation Functional** *(to minimize)*
+
+$$D =
+R^2 \cdot (1 + \lambda_{\text{necro}} \cdot \text{NCF}) \cdot (1 + \lambda_{\text{meta}} \cdot \text{MEI})$$
+
+where:
+
+$$R = \left(\frac{3N}{4\pi}\right)^{1/3}$$
+
+is the effective tumor radius estimated from the total number of cells.
+
+---
+
+#### Interpretation
+
+This functional is inspired by **transport optimization in physical systems** (e.g., river basin models). It represents the **energetic cost of sustaining tumor growth**.
+
+* $R^2$: geometric cost of expansion (surface-limited processes)
+* NCF: internal resistance due to necrosis
+* MEI: structural inefficiency due to metastasis
+
+---
+
+#### Optimization meaning
+
+Minimizing dissipation favors tumors that:
+
+* grow compactly
+* avoid internal damage
+* maintain structural integrity
+
+---
+
+### Purpose of Multi-Objective Optimization
+
+These objectives are **not independent** and often conflict:
+
+| Trade-off      | Meaning                   |
+| -------------- | ------------------------- |
+| Fitness vs MEI | growth vs invasion        |
+| Fitness vs NCF | growth vs oxygen collapse |
+| MEI vs NCF     | invasion vs hypoxia       |
+
+Because of these conflicts, no single parameter set optimizes all objectives simultaneously.
+
+Instead, the simulation identifies a **Pareto front**, consisting of solutions where it is possible that no objective can be improved without worsening another.
+
+---
+
+### Biological Interpretation
+
+Each point on the Pareto front corresponds to a **distinct tumor strategy**, such as:
+
+* **Efficient tumors**: high fitness, low MEI, low NCF. Most relevant for the RG analysis.
+* **Invasive tumors**: high MEI, moderate fitness
+* **Necrotic tumors**: high NCF, low viability
+* **Compact tumors**: low dissipation, low spread
+
+This allows the model to explore how different biological parameters shape tumor behavior under competing constraints.
+
+---
+
 ## Model Assumptions and Limitations
 
 Like all mathematical models of biological systems, this simulation relies on simplifying assumptions that allow the system to be computationally tractable while preserving the essential mechanisms of tumor growth.
@@ -378,24 +535,47 @@ For detailed usage instructions and implementation details, see the dedicated do
 Cancer_Metastasis_Simulations/
 │
 ├── 3D_Viewer/
-│   ├── README.md          # Documentation for the 3D viewer
-│   ├── viewer.py          # Entry point — GLUT window, render loop, event dispatch
-│   ├── scene.py           # Scene graph manager (add, render, pick, move, scale)
-│   ├── node.py            # Node base classes, primitives (Sphere, Cube), AABB
-│   ├── cancer_cell.py     # CancerCell hierarchical node (body + bumps)
-│   ├── interaction.py     # Mouse/keyboard callbacks, camera translation
-│   ├── trackball.py       # Quaternion trackball for 3D rotation
+│   ├── README.md              # Documentation for the 3D viewer
+│   ├── viewer.py              # Entry point — GLUT window, render loop, event dispatch
+│   ├── scene.py               # Scene graph manager (add, render, pick, move, scale)
+│   ├── node.py                # Node base classes, primitives (Sphere, Cube), AABB
+│   ├── cancer_cell.py         # CancerCell hierarchical node (body + bumps)
+│   ├── interaction.py         # Mouse/keyboard callbacks, camera translation
+│   ├── trackball.py           # Quaternion trackball for 3D rotation
 │   └── data/
 │       ├── tumor_cells.csv    # Per-cell snapshot (position, phenotype, bio-params)
 │       └── tumor_history.csv  # Per-step simulation statistics
 │
-├── Simulation/
+├── Simulations/
 │   ├── results/
-│   │   ├── tumor_results.png
-│   │   ├── tumor_diffusion.png
-│   │   └── tumor_comparison.png
-│   ├── Cancer Metastasis Full python.py   # Main simulation code
-│   └── Metastasis simulation.ipynb        # Simulation code explained by general blocks
+│   │   ├── 25 pairs-100 runs/        # Reduced sweep: 5α × 5β, 100 runs/pair
+│   │   ├── 36 pairs-200 runs/        # Reduced sweep: 6α × 6β, 200 runs/pair
+│   │   ├── 225 pairs-100 runs/       # Full sweep: 5α × 5β × 3γ × 3N_A, 100 runs/pair
+│   │   │   ├── pareto_plots/         # Figures generated by analyze_pareto.py
+│   │   │   │   ├── 01_strategy_classification.png
+│   │   │   │   ├── 02_parameter_mapping.png
+│   │   │   │   ├── 03_tradeoff_matrix.png
+│   │   │   │   ├── 04_phase_heatmaps_fitness.png
+│   │   │   │   ├── 04_phase_heatmaps_mei.png
+│   │   │   │   ├── 04_phase_heatmaps_ncf.png
+│   │   │   │   ├── 04_phase_heatmaps_dissipation.png
+│   │   │   │   ├── 05_time_evolution.png
+│   │   │   │   ├── 06_sensitivity.png
+│   │   │   │   └── 07_advanced.png
+│   │   │   ├── pareto_summary.csv        # Aggregation of the results of all runs that share initial parameters
+│   │   │   ├── raw_runs.csv              # Step-by-step history of every single simulation run
+│   │   │   └── run_summary.csv           # Summary of the results of each individual simulation run
+│   │   │
+│   │   ├── example_tumor_results.png
+│   │   ├── example_tumor_diffusion.png
+│   │   └── example_tumor_comparison.png
+│   │
+│   ├── Cancer Metastasis Full python.py   # Original simulation code (reproduces README examples)
+│   ├── Cancer_Metastasis.py               # Optimized vectorized simulation (recommended)
+│   ├── Metastasis simulation.ipynb        # Simulation code explained by general blocks
+│   ├── batch_sweep.py                     # Multi-run parameter sweep over (α, β, γ, N_A)
+│   ├── analyze_pareto.py                  # Pareto front analysis and figure generation
+│   └── analyze_pareto.ipynb               # Jupyter notebook version of analyze_pareto.py
 │
 ├── example-outputs/
 │   ├── example_tumor_results.png
@@ -423,6 +603,7 @@ Cancer_Metastasis_Simulations/
 
 Most libraries are built-in, but you'll need to install:
 - Libraries: `numpy`, `pandas`, `matplotlib` and `PyOpenGL`
+- Additional libraries for the batch sweep and analysis: `scikit-learn`, `scipy`, `seaborn`
 
 Install system GLUT if it is not already present:
 
@@ -450,22 +631,86 @@ cd Cancer_Metastasis_Simulations
 pip install -r requirements.txt
 ```
 
-### Running the Model
+### Running the Optimized Simulation
 
-To execute the main simulation and generate the data and plots similar to those found in [Example Output](#example-output) section **Run from terminal**:
-   ```bash
-   cd Simulation
-   python "Cancer Metastasis Full python.py"
-   ```
-   or
-   ```bash
-   cd Simulation
-   python3 "Cancer Metastasis Full python.py"
-   ```
+`Cancer_Metastasis.py` is the recommended entry point for new simulations. It is a vectorized, optimized rewrite of the original code with a corrected necrotic core dynamics. To run it:
+
+```bash
+cd Simulations
+python Cancer_Metastasis.py
+```
+
+### Running the Original Simulation
+
+To reproduce exactly the example results shown in the [Example Output](#example-output) section, use the original code:
+
+```bash
+cd Simulations
+python "Cancer Metastasis Full python.py"
+```
+
+### Running the Batch Parameter Sweep
+
+`batch_sweep.py` runs `Cancer_Metastasis.py` over a configurable grid of parameters. It supports both single-node execution and distributed SLURM array jobs.
+
+#### Single-node (runs all combinations sequentially/in parallel):
+
+```bash
+cd Simulations
+python batch_sweep.py
+```
+
+#### SLURM array-job mode:
+
+Submit one job per parameter combination using the provided example script. After all jobs finish, merge their outputs:
+
+```bash
+python batch_sweep.py --merge
+```
+
+An example SLURM submission script is included in the docstring of `batch_sweep.py`.
+
+The sweep parameters are configured at the top of the file:
+
+```python
+ALPHA_VALUES: list[float] = [0.3, 0.4, 0.5, 0.6, 0.7]   # resistance factor
+BETA_VALUES:  list[float] = [0.4, 0.5, 0.6, 0.7, 0.8]   # growth factor
+GAMMA_VALUES: list[float] = [-0.1, 0.0, 0.1]             # phenotype (condensing factor)
+N_A_VALUES:   list[int]   = [200, 500, 1000]              # angiogenic-switch threshold
+
+N_RUNS:  int = 100   # independent runs per parameter combination
+N_STEPS: int = 40    # simulation steps per run
+```
+
+The script produces three output CSV files:
+
+| File | Description |
+|------|-------------|
+| `raw_runs.csv` | Per-step history, one row per (run, timestep) |
+| `run_summary.csv` | Per-run objectives, one row per run |
+| `pareto_summary.csv` | Per-combination means and Pareto-front flag |
+
+### Running the Pareto Analysis
+
+`analyze_pareto.py` reads the three CSV files produced by `batch_sweep.py` and generates seven publication-quality figure groups inside `results/225 pairs-100 runs/pareto_plots/`:
+
+```bash
+cd Simulations
+python analyze_pareto.py
+```
+
+Alternatively, open the Jupyter notebook version for a step-by-step interactive walkthrough of each figure:
+
+```bash
+cd Simulations
+jupyter notebook analyze_pareto.ipynb
+```
 
 ---
 
 ## Example Output
+
+### Single Simulation
 
 With the following initial parameters:
 
@@ -586,6 +831,77 @@ Where the colors for each cell represent the following:
 | `condensing` | 🔵 Blue | `#0000FF` | Cells with a condensation phenotype |
 | `non-condensing` | 🔴 Red | `#FF0000` | Cells with a non-condensation phenotype |
 
+---
+
+### Batch Parameter Sweep
+
+`batch_sweep.py` sweeps four parameters simultaneously — `α`, `β`, `γ`, and `N_A` — running `N_RUNS` independent stochastic simulations per combination, and computes four multi-objective Pareto metrics per run:
+
+| Objective | Symbol | Direction | Definition |
+|---|---|---|---|
+| Fitness | FITNESS | maximise | `alive / (O_consumed × (1 + λ·meta))` |
+| Metastatic Efficiency Index | MEI | minimise | `total_metastatic_events / final_population` |
+| Necrotic Core Fraction | NCF | minimise | `necrotic_cells / total_cells` |
+| Dissipation | DISSIPATION | minimise | `R² × (1 + λ_necro·NCF) × (1 + λ_meta·MEI)` |
+
+where `R` is the geometric tumor radius estimated from the final cell count via `R = (3N / 4π)^(1/3)`, inspired by transport optimisation in river basin models.
+
+The full sweep — 225 combinations (5α × 5β × 3γ × 3N_A), 100 runs each — produces 22,500 individual simulations. Results are saved in `results/225 pairs-100 runs/`.
+
+Three earlier reduced sweeps are also available as reference in the `results/` folder:
+
+**`25 pairs-100 runs`** — 5α × 5β grid, 100 runs/pair:
+```python
+ALPHA_VALUES = [0.3, 0.4, 0.5, 0.6, 0.7]
+BETA_VALUES  = [0.4, 0.5, 0.6, 0.7, 0.8]
+```
+
+**`36 pairs-200 runs`** — 6α × 6β grid, 200 runs/pair:
+```python
+ALPHA_VALUES = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+BETA_VALUES  = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+```
+
+**`225 pairs-100 runs`** — full 4-parameter grid as configured in `batch_sweep.py`, 100 runs/pair:
+```python
+ALPHA_VALUES = [0.3, 0.4, 0.5, 0.6, 0.7]
+BETA_VALUES  = [0.4, 0.5, 0.6, 0.7, 0.8]
+GAMMA_VALUES = [-0.1, 0.0, 0.1]
+N_A_VALUES   = [200, 500, 1000]
+```
+
+---
+
+### Pareto Front Analysis
+
+`analyze_pareto.py` reads the three CSV files from `batch_sweep.py` and generates seven publication-quality figure groups saved to `results/225 pairs-100 runs/pareto_plots/`.
+
+#### Strategy Classification
+
+Pareto-front combinations are grouped into **four behavioral strategies** using KMeans clustering on the four normalized objectives:
+
+| Strategy | Color | Characteristics |
+|---|---|---|
+| **Efficient** | 🟢 Green | High fitness, low MEI, low NCF, low dissipation |
+| **Invasive** | 🔴 Red | High MEI, moderate fitness — aggressive metastasis |
+| **Necrotic** | 🟣 Purple | High NCF — large necrotic core, low viability |
+| **Explosive** | 🟠 Orange | High dissipation — fast growth, high energetic cost |
+
+#### Figure descriptions
+
+**`01_strategy_classification.png`** — Three scatter panels (Fitness vs MEI, Fitness vs NCF, MEI vs NCF) on the Pareto front, color-coded by the four strategies. A description table summarizes each cluster's characteristics.
+
+**`02_parameter_mapping.png`** — Fitness vs MEI on the Pareto front, with each of the four panels colored by a different input parameter (α, β, γ, N_A), showing which parameter values drive each region of the trade-off space.
+
+**`03_tradeoff_matrix.png`** — Full pairwise scatter matrix of the four objectives. The diagonal shows per-strategy histograms, the lower triangle shows strategy-colored scatter plots, and the upper triangle displays the Pearson correlation coefficient for each pair.
+
+**`04_phase_heatmaps_<objective>.png`** (four files) — One figure per objective (Fitness, MEI, NCF, Dissipation), showing a grid of α–β heatmaps, one panel per (γ, N_A) combination. Each cell is annotated with its mean value.
+
+**`05_time_evolution.png`** — Time series of population, mean division probability ⟨b⟩, mean death probability ⟨d⟩, and metastatic events per step, for one representative run from each of the four strategies.
+
+**`06_sensitivity.png`** — Marginal sensitivity analysis: for each (parameter, objective) pair, the mean objective is plotted as a function of that parameter while all others are pooled. Each panel is annotated with the η² statistic (fraction of variance explained by that parameter).
+
+**`07_advanced.png`** — Three advanced analyses: (A) knee-point detection on the Fitness vs MEI Pareto front (the combination closest to the utopia point); (B) Pearson correlation heatmap of all four objectives on the Pareto front; (C) Dissipation vs Fitness scatter with marker size proportional to NCF.
 
 ---
 
