@@ -1,0 +1,33 @@
+==================================================================
+Cancer Metastasis — Batch Parameter Sweep + Pareto
+==================================================================
+  α values      : [0.3, 0.4, 0.5, 0.6, 0.7]
+  β values      : [0.4, 0.5, 0.6, 0.7, 0.8]
+  Pairs         : 25  (5 × 5)
+  Runs / pair   : 100
+  Steps / run   : 40
+  Seeds         : 0 … 99
+  Total sims    : 2500
+  Workers       : 8 processes
+  Pop. cap      : 54,000 cells
+  Run timeout   : 900s
+  Lambda (fit.) : 0.01
+  λ_necro (dis.): 1.0
+  λ_meta  (dis.): 1.0
+  Output        : raw_runs.csv, run_summary.csv, pareto_summary.csv
+------------------------------------------------------------------
+  [  250/2500]  elapsed=1552.8s  rate=0.2/s  ETA≈13976s  (capped=32, timeouts=0, err=0)
+  [  500/2500]  elapsed=3047.8s  rate=0.2/s  ETA≈12191s  (capped=61, timeouts=0, err=0)
+  [  750/2500]  elapsed=4816.4s  rate=0.2/s  ETA≈11238s  (capped=97, timeouts=0, err=0)
+  [ 1000/2500]  elapsed=7098.1s  rate=0.1/s  ETA≈10647s  (capped=150, timeouts=1, err=0)        
+  [ 1250/2500]  elapsed=9165.0s  rate=0.1/s  ETA≈ 9165s  (capped=191, timeouts=2, err=0)        
+  [ 1500/2500]  elapsed=10715.7s  rate=0.1/s  ETA≈ 7144s  (capped=228, timeouts=3, err=0)       
+  [ 1750/2500]  elapsed=12219.0s  rate=0.1/s  ETA≈ 5237s  (capped=258, timeouts=3, err=0)       
+
+Computing Pareto front …
+  → pareto_summary.csv  (24 pairs on Pareto front)
+------------------------------------------------------------------
+Finished.  Total time: 17814.3s  (296.9 min)
+  raw_runs.csv    — per-step history
+  run_summary.csv   — per-run objectives
+  pareto_summary.csv — 24/25 pairs on Pareto front

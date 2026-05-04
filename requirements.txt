@@ -1,3 +1,7 @@
 PyOpenGL
 numpy
+pandas
+scikit-learn
+scipy
+seaborn
 matplotlib
