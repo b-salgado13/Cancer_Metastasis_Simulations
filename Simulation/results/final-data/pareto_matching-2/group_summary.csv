@@ -1,0 +1,3 @@
+treatment,n_tumours,mean_alpha,std_alpha,mean_beta,std_beta,mean_gamma,std_gamma,mean_n_a,std_n_a,mean_NCF_sim,mean_MEI,mean_Fitness,mean_Diss,frac_high_MEI
+Control,6,0.35,0.1225,0.6,0.1414,0.0,0.1673,475.0,301.2474,0.0379,0.0777,0.6284,4.1911,0.1667
+Treated,7,0.4143,0.09,0.5143,0.09,-0.0571,0.0535,628.5714,327.6903,0.042,0.149,0.1686,3.3146,0.2857

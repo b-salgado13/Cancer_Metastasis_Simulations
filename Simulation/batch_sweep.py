@@ -95,7 +95,7 @@ L:         int = 40
 # ── Objective parameters ──────────────────────────────────────────────────────
 LAMBDA:       float = 0.01   # penalty on metastatic events in FITNESS
 LAMBDA_NECRO: float = 1.0    # necrotic-resistance weight in DISSIPATION
-LAMBDA_META:  float = 1.0    # metastatic-load weight in DISSIPATION
+LAMBDA_META:  float = 5.0    # metastatic-load weight in DISSIPATION
 
 # ── Safety limits ─────────────────────────────────────────────────────────────
 MAX_CELLS:        int   = 54_000   # stop run early if population exceeds this

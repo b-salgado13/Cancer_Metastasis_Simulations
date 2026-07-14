@@ -1,0 +1,3 @@
+treatment,n_tumours,centroid_dist,alpha,beta,gamma,n_a,NCF_sim,MEI,Fitness,Dissipation,b_gamma,C_est,strategy
+Control,6,0.22976,0.3,0.6,0.0,750,0.06927,0.1246,0.28244,5.1498,0.6,0.4039,Necrotic
+Treated,7,0.35714,0.3,0.6,0.0,750,0.06927,0.1246,0.28244,5.1498,0.6,0.4039,Necrotic
